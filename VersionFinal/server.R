@@ -23,6 +23,8 @@ shinyServer(function(input, output, session) {
     
   })
   
+    #Define fonction for import a file
+  
   output$input_file <- renderTable({
     
       file_to_read = input$fichier
@@ -32,19 +34,18 @@ shinyServer(function(input, output, session) {
       read.table(file_to_read$datapath, sep = input$sep)
   })
   
+  # fonction for open new window for simulation
   observeEvent(input$simulation, {
     updateTabsetPanel(session = session,
                       inputId = 'mytabs',
                       selected = 'tab2')
   })
   
-  output$resultats1 <- renderUI({
-    textInput(inputId = "testl", label = "testl", value = 23)
-  })
   
+
  
    
-   #les helptexts
+   # define the  helptexts
    onevent("mouseover", "help1", show("txt1"))
    onevent("mouseleave", "help1", hide("txt1"))
    
@@ -91,11 +92,9 @@ shinyServer(function(input, output, session) {
    
    onevent("mouseover", "help17", show("txt17"))
    onevent("mouseleave", "help17", hide("txt17"))
-   #observeEvent(input$help1, {
-    # toggle("txt")
-   #})
+
    
-   #connection slider et numeric
+   #connection slider to his numeric input
    
    observeEvent(input$chargeText, {
      req(input$charge, input$chargeText)
@@ -153,7 +152,7 @@ shinyServer(function(input, output, session) {
      updateNumericInput(session, "volumetricText", value = input$volumetric, min = 1, max = 20000)
    })
    
-   #pour la consomation
+   # define logique for show and hide the widget from consumption
    observe({
      toggle(id = "Hauteconsomation", condition = input$DLS, anim = TRUE, animType = "fade", time = 0.5)
    })
@@ -212,16 +211,20 @@ shinyServer(function(input, output, session) {
    library(ggplot2)
    library(datasets)
    
+   # simulate the histogram
    randomVals <- eventReactive(input$simulation, {
      runif(45)
    })
    
+   # plot histogram
    plotInput <- function(){hist(randomVals())}
    
    output$plot <- renderPlot({
      hist(randomVals())
    })
    
+   
+  # fonction for download the plot
    output$downloadPlot <- downloadHandler(
      filename = "Shinyplot.png",
      content = function(file) {
@@ -234,34 +237,12 @@ shinyServer(function(input, output, session) {
    
    
    
-  # runQuery <- function(query){
-     #dat2 <- c(input$dates, input$charge2)
-    # dat <- data.frame(v1=rep(query,1))
-   #  return(dat)
-  # }
-   
-   #output$dataTable <- renderTable({
-    # query <- c(input$charge, input$volumetric, input$Hauteconsomation2)
-    # if(grepl("^Enter",query)){
-    #   return(data.frame(Error=query))
-     #} else {
-      # return(runQuery(query))
-    # }
-   #},include.rownames=TRUE)
+
    
   
    
    
- #  output$dataTable <- renderTable({
-  #   x <- data.frame(name = c("nb de jour", "heurs weekend", "charge", "prix", "types_de_batteries", "date_start", "tmp_resol", "size_battery"),
-    #                value = as.character(c(input$nb_jours_simulation,paste(input$Hauteconsomation2, collapse = "-"),input$charge, 55, input$types_de_batteries,as.character.Date(input$date_start), input$tmp_resol, input$size_battery))  )
-    # x},
-    # extensions = c('Buttons'), 
-    # options = list(
-     #  dom = 'Bfrtip',
-      # buttons = c('copy', 'csv', 'excel', 'pdf', 'print')
-  #   )
-  # )
+ 
 
    
   # output$downloadData <- downloadHandler(
@@ -274,17 +255,16 @@ shinyServer(function(input, output, session) {
   # )
    
    
-   #data <- shiny::reactive(data.frame(name = c("nb de jour", "heurs weekend", "charge", "prix", "types_de_batteries", "date_start", "tmp_resol", "size_battery"),
-                                      #value = as.character(c(input$nb_jours_simulation,paste(input$Hauteconsomation2, collapse = "-"),input$charge, 55, input$types_de_batteries,
-                                                            # as.character.Date(input$date_start), input$tmp_resol, input$size_battery))  ))
-  
+    # define the data to put in output
    mydata <- reactive({
-   data <- read.csv("downloadData.csv")
+   data <- read.csv("donnee.csv")
    return(data)
    })
    
+   # print the data table
    output$dataTable  <- renderTable(mydata())
    
+   # function using for download te data output
    output$downloadData <- downloadHandler(
      filename = function() {
        paste("test.csv")
